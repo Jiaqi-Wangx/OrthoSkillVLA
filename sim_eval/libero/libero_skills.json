@@ -1,0 +1,5 @@
+[
+    {"name": "pick_place", "task_ids": [12, 46, 74, 85], "lerobot_task_ids": [45, 0, 42, 10], "suite": "libero_90"},
+    {"name": "open_close", "task_ids": [22, 6, 28, 35], "lerobot_task_ids": [11, 8, 69, 57], "suite": "libero_90"},
+    {"name": "turn", "task_ids": [20, 39], "lerobot_task_ids": [65, 63],"suite": "libero_90"}
+]

@@ -1,0 +1,31 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+.ruff_cache/
+
+# Virtual environments
+.venv
+.python-version
+__pypackages__/
+
+# # Lock files
+# poetry.lock
+# uv.lock
+# Pipfile.lock
+
+
+# test
+test/*
+tests/*
+
+.note
+
+*logs/*
+*.mp4
+
+.cursor/*
+.vscode/*
