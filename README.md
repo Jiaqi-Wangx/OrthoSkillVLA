@@ -1,4 +1,4 @@
-# OrthoSkillVLA: Continual Skill Learning via Gradient-Informed Skill Subspace Adaptation
+# OrthoSkillVLA: Continual Skill Learning via Gradient-Informed Skill Subspace Adaptation (PRCV 2026)
 
 The implementation of OrthoSkillVLA, which enables a pretrained VLA model to continually adapt to multiple manipulation skills while preserving the acquired ones.
 
@@ -8,7 +8,7 @@ The implementation of OrthoSkillVLA, which enables a pretrained VLA model to con
 **Requirements:** Python ≥ 3.10, CUDA GPU (training and simulation eval).
 
 ```bash
-git clone https://github.com/JiaqiWng/OrthoSkillVLA.git
+git clone https://github.com/Jiaqi-Wangx/OrthoSkillVLA.git
 cd OrthoSkillVLA
 uv sync --all-groups
 ```
@@ -31,7 +31,9 @@ The skill splits can be found at [`sim_eval/libero/libero_skills.json`](sim_eval
 
 ### 3. Continual Skill Learning
 
-Edit [`scripts/batch/train_orthoskillvla.sh`](scripts/batch/train_orthoskillvla.sh):
+**Note:** The released training script is intended for single-process, single-GPU reproduction. It launches `accelerate` with `--num_processes 1`; multi-process / multi-GPU training is not supported in this release.
+
+Edit [`scripts/train_orthoskillvla.sh`](scripts/train_orthoskillvla.sh):
 
 | Variable | Description |
 |----------|-------------|
@@ -43,23 +45,20 @@ Edit [`scripts/batch/train_orthoskillvla.sh`](scripts/batch/train_orthoskillvla.
 Then run the following command to start training:
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 bash scripts/batch/train_orthoskillvla.sh \
+CUDA_VISIBLE_DEVICES=0 bash scripts/train_orthoskillvla.sh \
   <seed> <skill1> <skill2> <skill3> <order_tag>
 ```
 
-Example (open_close → turn → pick_place):
-
 ```bash
-CUDA_VISIBLE_DEVICES=0 bash scripts/batch/train_orthoskillvla.sh 1 open_close turn pick_place otp
+# ordering: open_close -> turn -> pick_place
+CUDA_VISIBLE_DEVICES=0 bash scripts/train_orthoskillvla.sh 1 open_close turn pick_place otp
+
+# ordering: pick_place -> open_close -> turn
+CUDA_VISIBLE_DEVICES=0 bash scripts/train_orthoskillvla.sh 1 pick_place open_close turn pot
+
+# ordering: open_close -> pick_place -> turn
+CUDA_VISIBLE_DEVICES=0 bash scripts/train_orthoskillvla.sh 1 open_close pick_place turn opt
 ```
-
-Preset scripts on 3 orderings:
-
-| Script | Skill order |
-|--------|-------------|
-| [`scripts/batch/otp.sh`](scripts/batch/otp.sh) | open_close → turn → pick_place |
-| [`scripts/batch/pot.sh`](scripts/batch/pot.sh) | pick_place → open_close → turn |
-| [`scripts/batch/opt.sh`](scripts/batch/opt.sh) | open_close → pick_place → turn |
 
 ### 4. Outputs
 
@@ -74,24 +73,25 @@ After training, each skill is saved under:
 
 ### 5. Simulation Evaluation
 
-1. Run policy server [`scripts/deploy.py`](scripts/deploy.py) in **Terminal 1**:
-    ```bash
-    source .venv/bin/activate 
-    CUDA_VISIBLE_DEVICES=0 python scripts/deploy.py \
-        --model_path /path/to/base_output_dir/run_name/last_skill/model \
-        --port 10096
-    ```
-2. Set up Libero Environment following the [official instructions](https://github.com/Lifelong-Robot-Learning/LIBERO).
-3. Run Libero evaluation [`sim_eval/libero/libero_client-skills.py`](sim_eval/libero/libero_client-skills.py) in **Terminal 2**:
-    ```bash
-    conda activate libero
-    CUDA_VISIBLE_DEVICES=0 python sim_eval/libero/libero_client-skills.py \
-        --server_ip 127.0.0.1 \
-        --server_port 10096 \
-        --eval_time 50 \
-        --output_dir orthoskillvla_logs \
-        --skill_ids 0 1 2
-    ```
+Set up Libero Environment following the [official instructions](https://github.com/Lifelong-Robot-Learning/LIBERO).
+
+Run policy server [`scripts/deploy.py`](scripts/deploy.py) in **Terminal 1**:
+```bash
+source .venv/bin/activate 
+CUDA_VISIBLE_DEVICES=0 python scripts/deploy.py \
+    --model_path /path/to/base_output_dir/run_name/last_skill/model \
+    --port 10096
+```
+Run Libero evaluation [`sim_eval/libero/libero_client-skills.py`](sim_eval/libero/libero_client-skills.py) in **Terminal 2**:
+```bash
+conda activate libero
+CUDA_VISIBLE_DEVICES=0 python sim_eval/libero/libero_client-skills.py \
+    --server_ip 127.0.0.1 \
+    --server_port 10096 \
+    --eval_time 50 \
+    --output_dir orthoskillvla_logs \
+    --skill_ids 0 1 2
+```
 
 `skill_ids` mapping in the eval client: `0` = `open_close`, `1` = `pick_place`, `2` = `turn`. Results are written to `{output_dir}/results.json`.
 

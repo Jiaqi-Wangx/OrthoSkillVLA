@@ -473,25 +473,26 @@ def train_one_skill(
             break
     progress.close()
 
+    if accelerator.is_main_process:
+        peft_model = accelerator.unwrap_model(model)
+        skill_output_dir = args.train.output_dir / args.orthoskillvla.skill_name
+
+        # adapter_output_dir = skill_output_dir / "adapter"
+        # adapter_output_dir.mkdir(parents=True, exist_ok=True)
+        # assert isinstance(peft_model, peft.PeftModel), "Expected the model to be a PeftModel after training"
+        # peft_model.save_pretrained(adapter_output_dir, safe_serialization=True)
+        # processor.save_pretrained(adapter_output_dir)
+        # logger.info(f"Saved LoRA adapter for skill {args.orthoskillvla.skill_name} to {adapter_output_dir}")
+
+        model_output_dir = skill_output_dir / "model"
+        model_output_dir.mkdir(parents=True, exist_ok=True)
+        merged_model = peft_model.merge_and_unload()
+        assert isinstance(merged_model, XVLA), "Expected the merged model to be an instance of XVLA"
+        merged_model.save_pretrained(model_output_dir, safe_serialization=True)
+        processor.save_pretrained(model_output_dir)
+        logger.info(f"Saved merged model for skill {args.orthoskillvla.skill_name} to {model_output_dir}")
+
     accelerator.wait_for_everyone()
-    peft_model = accelerator.unwrap_model(model)
-    skill_output_dir = args.train.output_dir / args.orthoskillvla.skill_name
-
-    # adapter_output_dir = skill_output_dir / "adapter"
-    # adapter_output_dir.mkdir(parents=True, exist_ok=True)
-    # assert isinstance(peft_model, peft.PeftModel), "Expected the model to be a PeftModel after training"
-    # peft_model.save_pretrained(adapter_output_dir, safe_serialization=True)
-    # processor.save_pretrained(adapter_output_dir)
-    # logger.info(f"Saved LoRA adapter for skill {args.orthoskillvla.skill_name} to {adapter_output_dir}")
-
-    model_output_dir = skill_output_dir / "model"
-    model_output_dir.mkdir(parents=True, exist_ok=True)
-    merged_model = peft_model.merge_and_unload()
-    assert isinstance(merged_model, XVLA), "Expected the merged model to be an instance of XVLA"
-    merged_model.save_pretrained(model_output_dir, safe_serialization=True)
-    processor.save_pretrained(model_output_dir)
-    logger.info(f"Saved merged model for skill {args.orthoskillvla.skill_name} to {model_output_dir}")
-
     accelerator.print(f"✅ Finished training skill {args.orthoskillvla.skill_name}.")
     accelerator.end_training()
 
