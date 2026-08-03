@@ -1,11 +1,22 @@
 # OrthoSkillVLA: Continual Skill Learning via Gradient-Informed Skill Subspace Adaptation (PRCV 2026)
 
-The implementation of OrthoSkillVLA, which enables a pretrained VLA model to continually adapt to multiple manipulation skills while preserving the acquired ones.
+
+Pretrained Vision-Language-Action models provide a strong foundation for robot learning, but sequentially adapting them to diverse skills can perturb the representations and velocity mappings used by previous skills, leading to catastrophic forgetting.
+Architecture-based approaches improve retention by isolating skills but lead to increased inference footprint.
+Recent subspace-constrained methods restrict parameter updates in an orthogonal subspace to minimize interference but impose a unified constraint on the entire model.
+We analyze the distinct roles of internal VLA components and identify two VLA-specific challenges.
+First, the VLM maintains broad semantic representations, making it vulnerable to capacity exhaustion, whereas the ActionHead refines semantics into localized velocity patterns that are highly sensitive to perturbations.
+Second, the final velocity decoder serves as a readout layer.
+Freezing it forms an output-stage expressivity bottleneck, while updating it risks overwriting previous velocity mappings.
+To this end, we propose **OrthoSkillVLA**, a parameter-efficient framework for continual skill learning in pretrained VLA models without demonstration replay.
+Given the representation heterogeneity, we impose separate subspace constraints on the VLM and ActionHead, preserving reusable semantic capacity while protecting localized velocity patterns.
+For the output layer, we introduce a lightweight feature-aware MoE decoder, where each skill is allocated a compact expert and a training-free router selects the expert according to feature-space affinity.
+Extensive simulated and real-world evaluations, together with ablations, demonstrate that OrthoSkillVLA better preserves prior skills while acquiring new ones.
 
 
 ## Installation
 
-**Requirements:** Python ≥ 3.10, CUDA GPU (training and simulation eval).
+**Requirements:** Python ≥ 3.10, RTX 4090 GPU (training and simulation eval).
 
 ```bash
 git clone https://github.com/Jiaqi-Wangx/OrthoSkillVLA.git
@@ -17,7 +28,10 @@ uv sync --all-groups
 
 ### 1. Pretrained Model and Dataset
 
-Pretrained X-VLA model weights can be found [here](https://anonymous-hf.up.railway.app/a/cjqqbgkyd9ae/) and Libero dataset in [LeRobot](https://github.com/huggingface/lerobot) v3.0 format [here](https://anonymous-hf.up.railway.app/a/kruojpuf79eo/)
+[Pretrained X-VLA model weights](https://huggingface.co/Jiaqi-Wangx/pretrained_xvla) 
+
+[Libero dataset in LeRobot v3.0 format]()
+
 
 ### 2. About Skill Splits
 
@@ -99,3 +113,15 @@ CUDA_VISIBLE_DEVICES=0 python sim_eval/libero/libero_client-skills.py \
 We gratefully acknowledge the following projects for their excellent open-source contributions: 
 - [X-VLA](https://github.com/2toinf/X-VLA)
 - [LeRobot](https://github.com/huggingface/lerobot)
+- [KeepLoRA](https://arxiv.org/abs/2601.19659)
+
+## Citation
+If you find this work or code useful in your research, please consider citing:
+```
+@inproceedings{jiaqi2026orthoskillvla,
+  title     = {Continual Skill Learning via Gradient-Informed Skill Subspace Adaptation},
+  author    = {Jiaqi Wang, Zhou Fang, Qiongfeng Shi and Yi Zhou},
+  booktitle = {Proceedings of the Chinese Conference on Pattern Recognition and Computer Vision (PRCV)},
+  year      = {2026},
+}
+```

@@ -15,8 +15,8 @@ exp_time_id=$(date +"%m%d_%H%M%S")
 # Configurations
 load_from=/path/to/pretrained/model
 base_output_dir=/base/output/dir
-repo_root=/path/to/orthoskillvla/libero_90_xvla
-repo_id=orthoskillvla/libero_90_xvla
+repo_root=/path/to/Jiaqi-Wangx/libero_90_xvla
+repo_id=Jiaqi-Wangx/libero_90_xvla
 
 skill_file="sim_eval/libero/libero_skills.json"
 seed=$1
