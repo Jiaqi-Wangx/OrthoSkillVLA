@@ -30,7 +30,7 @@ uv sync --all-groups
 
 [Pretrained X-VLA model weights](https://huggingface.co/Jiaqi-Wangx/pretrained_xvla) 
 
-[Libero dataset in LeRobot v3.0 format]()
+[Libero dataset in LeRobot v3.0 format](https://huggingface.co/datasets/Jiaqi-Wangx/libero_90_xvla)
 
 
 ### 2. About Skill Splits
