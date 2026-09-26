@@ -1,4 +1,4 @@
-# OrthoSkillVLA: Continual Skill Learning via Gradient-Informed Skill Subspace Adaptation (PRCV 2026)
+# OrthoSkillVLA: Continual Skill Learning via Gradient-Informed Skill Subspace Adaptation ([PRCV 2026](https://arxiv.org/abs/2608.19589))
 
 
 Pretrained Vision-Language-Action models provide a strong foundation for robot learning, but sequentially adapting them to diverse skills can perturb the representations and velocity mappings used by previous skills, leading to catastrophic forgetting.
